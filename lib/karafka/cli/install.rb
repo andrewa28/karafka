@@ -4,7 +4,7 @@ require 'erb'
 
 module Karafka
   # Karafka framework Cli
-  class Cli < Thor
+  class Cli
     # Install Karafka Cli action
     class Install < Base
       desc 'Install all required things for Karafka application in current directory'

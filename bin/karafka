@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'karafka'
+require_relative '../lib/karafka'
+require 'optparse'
 
 # If there is a boot file, we need to require it as we expect it to contain
 # Karafka app setup, routes, etc
@@ -15,5 +16,22 @@ else
   ) unless %w[-h install].include?(ARGV[0])
 end
 
-Karafka::Cli.prepare
-Karafka::Cli.start
+# Command we want to run, like install, server, etc
+command_name = ARGV[0]
+# Action for action-based commands like topics migrate
+action = ARGV[1] unless ARGV[1].to_s.start_with?('-')
+
+Karafka::Cli::Base.load
+
+ObjectSpace
+  .each_object(Class).select { |klass| klass < Karafka::Cli::Base }
+  .each do |command|
+    next unless command.names.include?(command_name)
+
+    # Only actionable commands require command as an argument
+    args = action ? [action] : []
+
+    return command.new.call(*args)
+  end
+
+raise
