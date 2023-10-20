@@ -1,15 +1,20 @@
 # frozen_string_literal: true
 
+<<<<<<< HEAD
 RSpec.describe Karafka::Cli::Server do
   subject(:server_cli) { described_class.new(cli) }
+=======
+RSpec.describe_current do
+  subject(:server_cli) { described_class.new }
+>>>>>>> 4cd72517 (Remove `thor` (#1680))
 
-  let(:cli) { Karafka::Cli.new }
   let(:pid) { rand.to_s }
 
   specify { expect(described_class).to be < Karafka::Cli::Base }
 
   describe '#call' do
     context 'when we run in foreground (not daemonized)' do
+<<<<<<< HEAD
       before do
         allow(cli).to receive(:info)
         allow(Karafka::Server).to receive(:run)
@@ -20,6 +25,8 @@ RSpec.describe Karafka::Cli::Server do
         server_cli.call
       end
 
+=======
+>>>>>>> 4cd72517 (Remove `thor` (#1680))
       it 'expect not to daemonize anything' do
         expect(server_cli).not_to receive(:daemonize)
         server_cli.call
@@ -91,5 +98,9 @@ RSpec.describe Karafka::Cli::Server do
 
       server_cli.send(:clean)
     end
+  end
+
+  describe '#names' do
+    it { expect(server_cli.class.names).to eq %w[s server] }
   end
 end

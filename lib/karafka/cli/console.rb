@@ -2,11 +2,12 @@
 
 module Karafka
   # Karafka framework Cli
-  class Cli < Thor
+  class Cli
     # Console Karafka Cli action
     class Console < Base
-      desc 'Start the Karafka console (short-cut alias: "c")'
-      option aliases: 'c'
+      desc 'Starts the Karafka console (short-cut alias: "c")'
+
+      aliases :c
 
       class << self
         # @return [String] Console executing command
@@ -23,8 +24,11 @@ module Karafka
 
       # Start the Karafka console
       def call
-        cli.info
-        exec self.class.command
+        Info.new.call
+
+        command = ::Karafka.rails? ? self.class.rails_console : self.class.console
+
+        exec "KARAFKA_CONSOLE=true #{command}"
       end
     end
   end

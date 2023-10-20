@@ -72,3 +72,20 @@ Karafka::App.boot!
 Karafka.monitor.subscribe(WaterDrop::Instrumentation::StdoutListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::StdoutListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
+
+# @param file_path [String] path within fixtures dir to the expected file
+# @return [String] fixture file content
+def fixture_file(file_path)
+  File.read(
+    File.join(
+      Karafka.gem_root,
+      'spec',
+      'support',
+      'fixtures',
+      file_path
+    )
+  )
+end
+
+# We need to clear argv because otherwise we would get reports on invalid options for CLI specs
+ARGV.clear

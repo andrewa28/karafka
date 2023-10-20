@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
+<<<<<<< HEAD
 RSpec.describe Karafka::Cli::Info do
   subject(:info_cli) { described_class.new(cli) }
 
   let(:cli) { Karafka::Cli.new }
+=======
+RSpec.describe_current do
+  subject(:info_cli) { described_class.new }
+>>>>>>> 4cd72517 (Remove `thor` (#1680))
 
   specify { expect(described_class).to be < Karafka::Cli::Base }
 
@@ -27,5 +32,9 @@ RSpec.describe Karafka::Cli::Info do
       expect(Karafka.logger).to receive(:info).with(info)
       info_cli.call
     end
+  end
+
+  describe '#names' do
+    it { expect(info_cli.class.names).to eq %w[info] }
   end
 end

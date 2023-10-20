@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
+<<<<<<< HEAD
 RSpec.describe Karafka::Cli::Install do
   subject(:install_cli) { described_class.new(cli) }
 
   let(:cli) { Karafka::Cli.new }
+=======
+RSpec.describe_current do
+  subject(:install_cli) { described_class.new }
+>>>>>>> 4cd72517 (Remove `thor` (#1680))
 
   specify { expect(described_class).to be < Karafka::Cli::Base }
 
@@ -32,7 +37,7 @@ RSpec.describe Karafka::Cli::Install do
   end
 
   describe '#rails?' do
-    subject(:is_rails) { described_class.new(cli).rails? }
+    subject(:is_rails) { described_class.new.rails? }
 
     before { allow(Bundler).to receive(:read_file).and_return(gemfile) }
 
@@ -47,5 +52,9 @@ RSpec.describe Karafka::Cli::Install do
 
       it { expect(is_rails).to eq true }
     end
+  end
+
+  describe '#names' do
+    it { expect(install_cli.class.names).to eq %w[install] }
   end
 end

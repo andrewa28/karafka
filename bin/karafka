@@ -15,5 +15,5 @@ else
   ) unless %w[-h install].include?(ARGV[0])
 end
 
-Karafka::Cli.prepare
-Karafka::Cli.start
+::Karafka::Cli::Base.load
+::Karafka::Cli.start

@@ -2,7 +2,7 @@
 
 module Karafka
   # Karafka framework Cli
-  class Cli < Thor
+  class Cli
     # Server Karafka Cli action
     class Server < Base
       # Server config settings contract
@@ -10,56 +10,100 @@ module Karafka
 
       private_constant :CONTRACT
 
-      desc 'Start the Karafka server (short-cut alias: "s")'
+      desc 'Starts the Karafka server (short-cut alias: "s")'
+
       aliases :s
-      option :daemon, default: false, type: :boolean, aliases: :d
-      option :pid, default: 'tmp/pids/karafka', type: :string, aliases: :p
-      option :consumer_groups, type: :array, default: nil, aliases: :g
+
+      option(
+        :consumer_groups,
+        'Runs server only with specified consumer groups',
+        Array,
+        %w[
+          -g
+          --consumer_groups
+          --include_consumer_groups
+        ]
+      )
+
+      option(
+        :subscription_groups,
+        'Runs server only with specified subscription groups',
+        Array,
+        %w[
+          --subscription_groups
+          --include_subscription_groups
+        ]
+      )
+
+      option(
+        :topics,
+        'Runs server only with specified topics',
+        Array,
+        %w[
+          --topics
+          --include_topics
+        ]
+      )
+
+      option(
+        :exclude_consumer_groups,
+        'Runs server without specified consumer groups',
+        Array,
+        %w[
+          --exclude_consumer_groups
+        ]
+      )
+
+      option(
+        :exclude_subscription_groups,
+        'Runs server without specified subscription groups',
+        Array,
+        %w[
+          --exclude_subscription_groups
+        ]
+      )
+
+      option(
+        :exclude_topics,
+        'Runs server without specified topics',
+        Array,
+        %w[
+          --exclude_topics
+        ]
+      )
 
       # Start the Karafka server
       def call
         cli.info
 
-        validate!
-
-        if cli.options[:daemon]
-          FileUtils.mkdir_p File.dirname(cli.options[:pid])
-          daemonize
-        end
-
-        # We assign active topics on a server level, as only server is expected to listen on
-        # part of the topics
-        Karafka::Server.consumer_groups = cli.options[:consumer_groups]
+        register_inclusions
+        register_exclusions
 
         Karafka::Server.run
       end
 
       private
 
-      # Checks the server cli configuration
-      # options validations in terms of app setup (topics, pid existence, etc)
-      def validate!
-        result = CONTRACT.call(cli.options)
-        return if result.success?
+      # Registers things we want to include (if defined)
+      def register_inclusions
+        activities = ::Karafka::App.config.internal.routing.activity_manager
 
-        raise Errors::InvalidConfigurationError, result.errors.to_h
+        SUPPORTED_TYPES.each do |type|
+          names = options[type] || []
+
+          names.each { |name| activities.include(type, name) }
+        end
       end
 
-      # Detaches current process into background and writes its pidfile
-      def daemonize
-        ::Process.daemon(true)
-        File.open(
-          cli.options[:pid],
-          'w'
-        ) { |file| file.write(::Process.pid) }
+      # Registers things we want to exclude (if defined)
+      def register_exclusions
+        activities = ::Karafka::App.config.internal.routing.activity_manager
 
-        # Remove pidfile on stop, just before the server instance is going to be GCed
-        # We want to delay the moment in which the pidfile is removed as much as we can,
-        # so instead of removing it after the server stops running, we rely on the gc moment
-        # when this object gets removed (it is a bit later), so it is closer to the actual
-        # system process end. We do that, so monitoring and deployment tools that rely on a pid
-        # won't alarm or start new system process up until the current one is finished
-        ObjectSpace.define_finalizer(self, proc { send(:clean) })
+        activities.class::SUPPORTED_TYPES.each do |type|
+          names = options[:"exclude_#{type}"] || []
+
+          names.each { |name| activities.exclude(type, name) }
+        end
       end
 
       # Removes a pidfile (if exist)

@@ -4,7 +4,7 @@ require 'erb'
 
 module Karafka
   # Karafka framework Cli
-  class Cli < Thor
+  class Cli
     # Install Karafka Cli action
     class Install < Base
       desc 'Install all required things for Karafka application in current directory'
@@ -27,9 +27,9 @@ module Karafka
         'application_responder.rb.erb' => 'app/responders/application_responder.rb'
       }.freeze
 
-      # @param args [Array] all the things that Thor CLI accepts
-      def initialize(*args)
+      def initialize
         super
+
         dependencies = Bundler::LockfileParser.new(
           Bundler.read_file(
             Bundler.default_lockfile
