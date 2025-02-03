@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Karafka
-  class Cli < Thor
+  class Cli
     # Command that gets invoked when no method is provided when running the CLI
     # It allows us to exit with exit code 1 instead of default 0 to indicate that something
     #   was missing

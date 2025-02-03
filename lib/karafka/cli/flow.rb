@@ -2,7 +2,7 @@
 
 module Karafka
   # Karafka framework Cli
-  class Cli < Thor
+  class Cli
     # Description of topics flow (incoming/outgoing)
     class Flow < Base
       desc 'Print application data flow (incoming => outgoing)'
