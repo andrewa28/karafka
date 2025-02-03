@@ -20,7 +20,6 @@ module Karafka
       end
 
       class << self
-        alias original_bind_to bind_to
         # Allows to set options for Thor cli
         # @see https://github.com/erikhuda/thor
         # @param option Single option details
