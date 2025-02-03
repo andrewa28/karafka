@@ -59,18 +59,32 @@ module Karafka
         # This method is a wrapper to way Thor defines its commands
         # @param cli_class [Karafka::Cli] Karafka cli_class
         def bind_to(cli_class)
-          cli_class.desc name, *@desc
+          @aliases ||= []
+          @options ||= []
 
-          (@options || []).each { |option| cli_class.option(*option) }
+          # We're late to the party here, as the +karafka/cli/console+ and
+          # +karafka/cli/server+ files were already required and therefore they
+          # already wrote to the +@options+ array. So we will sanitize/split
+          # the options here to allow correct usage of the original Karafka 1.4
+          # +.bind_to+ method.
+          @options.select! do |set|
+            # We look for option sets without name (aliases),
+            # a regular set looks like this: +[:daemon, {:default=>false, ..}]+
+            next true unless set.first.is_a? Hash
 
-          context = self
+            # An alias looks like this: +[{:aliases=>"s"}]+
+            @aliases << set.first[:aliases].to_s
 
-          cli_class.send :define_method, name do |*args|
-            context.new(self).call(*args)
+            # Strip this set from the options
+            false
           end
 
-          (@aliases || []).each do |cmd_aliases|
-            cmd_aliases.each { |cmd_alias| cli_class.map cmd_alias => name.to_s }
+          # Run the original Karafka 1.4 +.bind_to+ method
+          original_bind_to(cli_class)
+
+          # Configure the command aliases
+          @aliases.each do |cmd_alias|
+            cli_class.map cmd_alias => name.to_s
           end
         end
 
