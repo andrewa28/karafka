@@ -7,7 +7,6 @@
   kafka
   envlogic
   json
-  thor
   forwardable
   fileutils
   concurrent
@@ -17,6 +16,7 @@
   dry/inflector
   dry/monitor/notifications
   dry/core/constants
+  optparse
   zeitwerk
 ].each(&method(:require))
 
