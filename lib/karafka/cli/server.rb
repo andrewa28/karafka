@@ -10,8 +10,9 @@ module Karafka
 
       private_constant :CONTRACT
 
-      desc 'Start the Karafka server (short-cut alias: "s")'
-      option aliases: 's'
+      desc 'Starts the Karafka server (short-cut aliases: "s", "consumer")'
+
+      option :consumer, aliases: '-s'
       option :daemon, default: false, type: :boolean, aliases: :d
       option :pid, default: 'tmp/pids/karafka', type: :string, aliases: :p
       option :consumer_groups, type: :array, default: nil, aliases: :g
